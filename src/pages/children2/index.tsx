@@ -14,22 +14,21 @@ export default function IndexPage() {
           fn(message.data)
         }, false)
       }, send: message => {
-        iframeRef.current?.contentWindow.postMessage(message, '*')
+        window.parent.postMessage(message, '*')
       }})
   }, [iframeRef.current])
   useEffect(() => {
-    br.handle('ptest', () => 7777)
-  }, [iframeRef.current])
+    br.handle('test', () => 666)
+  }, [br])
   const testClick = useCallback(() => {
-    br?.invoke('test', {
+    br?.invoke('ptest', {
       aaa: '2222'
     }).then(data => console.log(data))
   }, [])
   return (
     <div>
-      <h1 className={styles.title}>Page index</h1>
+      <h1 className={styles.title}>子页面</h1>
       <button onClick={testClick}>测试</button>
-      <iframe src='//localhost:8000/c1' ref={iframeRef}></iframe>
     </div>
   );
 }
