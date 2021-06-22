@@ -1,10 +1,13 @@
-import Bridge, {BridgeOptions}  from './Bridge'
+import Bridge, {BridgeOptions, Event}  from './Bridge'
 import { v4 as uuidv4 } from 'uuid'
 declare module 'uuid'
 
-enum nodeEvent {
+enum NODEEVENT {
   init = '$nodeInit',
   transmit = '$transmit'
+}
+interface NEvent extends Event {
+  path?: string
 }
 
 export default class Node {
@@ -14,12 +17,15 @@ export default class Node {
   constructor({id, bridgeList}: {id: string, bridgeList: BridgeOptions[]}) {
     this._id = id;
     this.addBridge(bridgeList)
+    this.on(NODEEVENT.init, (data, event) => {
+
+    })
   }
   addBridge(bridgeList: BridgeOptions[]) {
     bridgeList.forEach(n => {
       let id = uuidv4();
       this._bridgeMap[id] = new Bridge(n)
-      this._bridgeMap[id].send(nodeEvent.init, {id: this._id})
+      this._bridgeMap[id].send(NODEEVENT.init, {id: this._id})
     })
   }
   private transmit() {
@@ -38,7 +44,22 @@ export default class Node {
       })
     }
   }
-  on() {}
+  on(nodeId: string, event: string, fn: () => any): any
+  on(event: string, fn: () => any): any
+  on(a: string, b: any, c?: any): any {
+    if(c) {
+
+    } else {
+      Object.keys(this._bridgeMap).forEach(key => {
+        this._bridgeMap[key].on(a, (data: any, event: NEvent) => {
+          let e = Object.assign({}, event, {
+            path: event.path ? `${key}__${event.path}` : key
+          })
+          c(data, {event})
+        })
+      })
+    }
+  }
   off() {}
   once() {}
   handle() {}

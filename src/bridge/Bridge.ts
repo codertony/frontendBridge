@@ -1,17 +1,17 @@
 //@ts-ignore
-import * as EventEmitter from 'events'
+import EventEmitter from 'events';
 
 export interface BridgeOptions {
 	send: (mes: string) => void
 	onMessage: (fn: (mes: string) => void) => void
 }
-interface Event {
+export interface Event {
 	channel: string
 	// 消息id,组成：${pid}-${消息数目id}
 	messageId: string
 	data: any
 }
-export type IHandle = (data: any, event: Event) => void
+export type IHandle = (data: any, event: Event) => any | undefined
 
 export default class Bridge {
 	private eventEmit = new EventEmitter()
